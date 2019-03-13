@@ -31,8 +31,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
-//import org.elasticsearch.test.ESIntegTestCase;
-import org.elasticsearch.common.xcontent.XContentElasticsearchExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +61,6 @@ public class ESConnection implements Connection{
 	private boolean readOnly = true;
 	private List<ESStatement> statements = new ArrayList<ESStatement>();
 
-	private XContentElasticsearchExtension xc = new XContentElasticsearchExtension();
 	/**
 	 * Builds the es {@link Client} using the provided parameters. 
 	 * @param host
@@ -92,15 +89,13 @@ public class ESConnection implements Connection{
 	 * @throws SQLException
 	 */
 	private Client buildClient() throws SQLException {
-		/*if(props.containsKey("test")){ // used for integration tests
-			return ESIntegTestCase.client();
-		}else*/ try {
+		try {
 			Properties properties = new Properties();
 
             properties.put("client.type", "transport");
             properties.put("http.type.default", "netty4");
             properties.put("network.server", "false");
-            properties.put("node.name", "_client_");
+            //properties.put("node.name", "_client_");
             properties.put("transport.features.transport_client", "true");
             properties.put("transport.ping_schedule", "5s");
             properties.put("transport.type.default", "netty4");
@@ -190,7 +185,7 @@ public class ESConnection implements Connection{
 	}
 
 	@Override
-	public String nativeSQL(String sql) throws SQLException {
+	public String nativeSQL(String sql) {
 		return sql;
 	}
 
