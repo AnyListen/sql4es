@@ -32,7 +32,7 @@ public class OrderByParser extends AstVisitor<OrderBy, QueryState>{
 						(DereferenceExpression)((IsNullPredicate)when.getOperand()).getValue());
 			}
 		}else if(si.getSortKey() instanceof Identifier){
-			orderKey = ((Identifier)si.getSortKey()).getName(); //.getValue();
+			orderKey = ((Identifier)si.getSortKey()).getValue();
 		}else {
 			state.addException("Order statement with type '"+si.getSortKey().getClass().getName()+"' is not supported");
 			return null;

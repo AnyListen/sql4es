@@ -155,8 +155,9 @@ public class QueryParser extends AstVisitor<ParseResult, Object>{
 		}
 
 		// parse ORDER BY
-		if(node.getOrderBy().isEmpty()){
-			for(SortItem si : node.getOrderBy()/*.get().getSortItems()*/){
+		if(node.getOrderBy().isPresent()){
+			//for(SortItem si : node.getOrderBy()/*.get().getSortItems()*/){
+			for(SortItem si : node.getOrderBy().get().getSortItems()){
 				OrderBy ob = si.accept(orderOarser, state);
 				if(state.hasException()) return new ParseResult(state.getException());
 				orderings.add(ob);

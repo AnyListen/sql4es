@@ -8,7 +8,6 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.regex.Pattern;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.metadata.AliasMetaData;

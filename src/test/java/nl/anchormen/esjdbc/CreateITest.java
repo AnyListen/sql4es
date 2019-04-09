@@ -21,8 +21,8 @@ import nl.anchormen.sql4es.model.Utils;
  */
 public class CreateITest extends Sql4EsBase {
 
-	private String index = "testindex";
-	private String type = "type";
+	private String index = "camp";
+	private String type = "doc";
 	
 	public CreateITest() throws Exception {
 		super();
@@ -30,27 +30,27 @@ public class CreateITest extends Sql4EsBase {
 
 	@Test
 	public void createSimple() throws Exception{
-		createIndex(index);
+		//createIndex(index);
 		Connection conn = DriverManager.getConnection("jdbc:sql4es://localhost:9300/"+index+"?test");
 		Statement st = conn.createStatement();
-		boolean res = st.execute("CREATE TABLE simpletype (myString \"type:keyword\", myInt \"type:integer\", myDate \"type:date\")");
+		boolean res = st.execute("CREATE TABLE doc (myString \"type:keyword\", myInt \"type:integer\", myDate \"type:date\")");
 		assert(!res);
 		flush();
 		refresh();
 		DatabaseMetaData dmd = conn.getMetaData();
-		ResultSet rs = dmd.getTables(null, index, "simpletype",null);
+		ResultSet rs = dmd.getTables(null, index, "doc",null);
 		int count = 0;
 		while(rs.next()) count++;
 		assertEquals(1, count);
 		rs.close();
 		
-		res = st.execute("INSERT INTO simpletype (myString, myInt, myDate) "
+		res = st.execute("INSERT INTO doc (myString, myInt, myDate) "
 				+ "VALUES ('abc', 1, '2016-01-09T16:35:46'), ('def', 2, '2016-01-10T12:26:12'), ('ghi', 3, '2016-01-11T09:01:07')");
 		assert(!res);
 		flush();
 		refresh();
 		
-		rs = st.executeQuery("SELECT * FROM simpletype");
+		rs = st.executeQuery("SELECT * FROM doc");
 		ResultSetMetaData rsm = rs.getMetaData();
 		assertEquals(Types.VARCHAR, rsm.getColumnType(4));
 		assertEquals(Types.TIMESTAMP, rsm.getColumnType(5));

@@ -2,7 +2,6 @@ package nl.anchormen.sql4es.parse.sql;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -34,8 +33,8 @@ public class GroupParser extends SelectParser {
 	public TermsAggregationBuilder parse(List<GroupingElement> elements, QueryState state){
 		List<Column> groups = new ArrayList<Column>();
 		for(GroupingElement grouping : elements){
-			for(Set<Expression> expressions : grouping.enumerateGroupingSets()){
-				for(Expression e : expressions)	groups.add((Column) process(e, state) );
+			for(Expression e : grouping.getExpressions()){
+				groups.add((Column) process(e, state));
 			}
 		}
 		

@@ -35,7 +35,7 @@ public class HavingParser extends AstVisitor<IComparison, QueryState>{
 			LogicalBinaryExpression boolExp = (LogicalBinaryExpression)node;
 			IComparison left = process(boolExp.getLeft(), state);
 			IComparison right = process(boolExp.getRight(), state);
-			return new BooleanComparison(left, right, boolExp.getType() == LogicalBinaryExpression.Type.AND);
+			return new BooleanComparison(left, right, boolExp.getOperator() == LogicalBinaryExpression.Operator.AND);
 		}else if( node instanceof ComparisonExpression){
 			ComparisonExpression compareExp = (ComparisonExpression)node;
 			Column column = new SelectParser().visitExpression(compareExp.getLeft(), state);
@@ -55,7 +55,7 @@ public class HavingParser extends AstVisitor<IComparison, QueryState>{
 					state.addException("Unable to get value from "+compareExp.getRight());
 					return null;
 				}
-				return new SimpleComparison(leftCol, compareExp.getType(), (Number)value);
+				return new SimpleComparison(leftCol, compareExp.getOperator(), (Number)value);
 			
 				// right hand side refers to another column 	
 			} else if(compareExp.getRight() instanceof DereferenceExpression || compareExp.getRight() instanceof Identifier){
@@ -64,7 +64,7 @@ public class HavingParser extends AstVisitor<IComparison, QueryState>{
 					// parse columns like 'reference.field'
 					col2 = SelectParser.visitDereferenceExpression((DereferenceExpression)compareExp.getRight());
 				}else{
-					col2 = ((Identifier)compareExp.getRight()).getName(); //.getValue();
+					col2 = ((Identifier)compareExp.getRight()).getValue();
 				}
 				col2 = Heading.findOriginal(state.originalSql(), col2, "having.+", "\\W");
 				Column rightCol = state.getHeading().getColumnByLabel(col2);
@@ -72,7 +72,7 @@ public class HavingParser extends AstVisitor<IComparison, QueryState>{
 					state.addException("column "+col2+" not found in SELECT clause");
 					return null;
 				}
-				return new SimpleComparison(leftCol, compareExp.getType(), rightCol);
+				return new SimpleComparison(leftCol, compareExp.getOperator(), rightCol);
 			}else { // unknown right hand side so
 				state.addException("Unable to get value from "+compareExp.getRight());
 				return null;

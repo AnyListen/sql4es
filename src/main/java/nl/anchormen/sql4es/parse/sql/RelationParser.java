@@ -35,7 +35,7 @@ public class RelationParser extends AstVisitor<List<QuerySource> , QueryState>{
 			AliasedRelation ar = (AliasedRelation)node;
 			state.setKeyValue("table_alias", ar.getAlias());
 			List<QuerySource> relations = ar.getRelation().accept(this, state);
-			for(QuerySource rr : relations) rr.setAlias(ar.getAlias()); //.getValue());
+			for(QuerySource rr : relations) rr.setAlias(ar.getAlias().getValue());
 			return relations;
 		}else if( node instanceof QueryBody){
 			return node.accept(this, state);

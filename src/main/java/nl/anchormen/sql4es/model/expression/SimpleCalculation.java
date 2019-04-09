@@ -9,11 +9,11 @@ public class SimpleCalculation implements ICalculation {
 
 	private ICalculation left;
 	private ICalculation right;
-	private ArithmeticBinaryExpression.Type type;
+	private ArithmeticBinaryExpression.Operator type;
 	private Number result = null;
 	private Sign sign = Sign.PLUS;
 	
-	public SimpleCalculation(ICalculation left, ICalculation right, ArithmeticBinaryExpression.Type type) {
+	public SimpleCalculation(ICalculation left, ICalculation right, ArithmeticBinaryExpression.Operator type) {
 		this.left = left;
 		this.right = right;
 		this.type = type;
@@ -48,7 +48,7 @@ public class SimpleCalculation implements ICalculation {
 		return right;
 	}
 	
-	public ArithmeticBinaryExpression.Type getType(){
+	public ArithmeticBinaryExpression.Operator getType(){
 		return type;
 	}
 	

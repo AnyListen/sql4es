@@ -454,18 +454,13 @@ public class ESUpdateState {
 		sb.append("{");
 		boolean templatesAdded = false;
 		if(create.getProperties().size() >= 0){
-/*			List<Property> props = create.getProperties();
+			List<Property> props = create.getProperties();
 			for (Property prop : props) {
 				if (prop.getName().getValue().equals("dynamic_templates")) {
 					sb.append("dynamic_templates:"+removeEnclosingQuotes( prop.getValue().toString()));
 					templatesAdded = true;
 				}
-			}*/
-            Map<String, Expression> props = create.getProperties();
-            if(props.containsKey("dynamic_templates")){
-                sb.append("dynamic_templates:"+removeEnclosingQuotes( props.get("dynamic_templates").toString()));
-                templatesAdded = true;
-            }
+			}
 			// add other 'index global' stuff
 		}
 		if(templatesAdded) sb.append(", ");
@@ -474,7 +469,8 @@ public class ESUpdateState {
 		for(int i=0; i<fields.size(); i++){
 			ColumnDefinition field = (ColumnDefinition)fields.get(i);
 			if(field.getName().equals("_id") || field.getName().equals("_type")) continue; // skip protected fields
-			sb.append("\""+field.getName()+"\":{\""+field.getType().replaceAll(":","\":\"")+"\"}");
+			sb.append("\""+field.getName()+"\":{"+field.getType().substring(1, field.getType().length() -1)
+					.replaceAll("(\\S+)\\s*:\\s*([^,]+)(\\s*,)?","\"$1\": \"$2\"$3")+ "}");
 			if(i<fields.size()-1) sb.append(", ");
 		}
 		sb.append("}}"); // close type and properties blocks

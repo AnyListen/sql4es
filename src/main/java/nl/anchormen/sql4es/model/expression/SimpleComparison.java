@@ -3,7 +3,7 @@ package nl.anchormen.sql4es.model.expression;
 import java.sql.SQLException;
 import java.util.List;
 
-import com.facebook.presto.sql.tree.ComparisonExpressionType;
+import com.facebook.presto.sql.tree.ComparisonExpression;
 
 
 import nl.anchormen.sql4es.model.Column;
@@ -11,18 +11,18 @@ import nl.anchormen.sql4es.model.Column;
 public class SimpleComparison implements IComparison{
 
 	private Column leftColumn;
-	private ComparisonExpressionType comparisonType;
+	private ComparisonExpression.Operator comparisonType;
 	private Number rightValue;
 	private Column rightColumn;
 	
-	public SimpleComparison(Column column, ComparisonExpressionType comparisonType, Number value) {
+	public SimpleComparison(Column column, ComparisonExpression.Operator comparisonType, Number value) {
 		super();
 		this.leftColumn = column;
 		this.comparisonType = comparisonType;
 		this.rightValue = value;
 	}
 	
-	public SimpleComparison(Column leftColumn, ComparisonExpressionType comparisonType, Column rightColumn) {
+	public SimpleComparison(Column leftColumn, ComparisonExpression.Operator comparisonType, Column rightColumn) {
 		super();
 		this.leftColumn = leftColumn;
 		this.comparisonType = comparisonType;
@@ -52,11 +52,11 @@ public class SimpleComparison implements IComparison{
 				rightValue = this.rightValue.doubleValue();
 			}
 
-			if(this.comparisonType == ComparisonExpressionType.EQUAL) return leftValue.equals( rightValue );
-			if(this.comparisonType == ComparisonExpressionType.GREATER_THAN) return leftValue > rightValue;
-			if(this.comparisonType == ComparisonExpressionType.GREATER_THAN_OR_EQUAL) return leftValue >= rightValue;
-			if(this.comparisonType == ComparisonExpressionType.LESS_THAN) return leftValue < rightValue;
-			if(this.comparisonType == ComparisonExpressionType.LESS_THAN_OR_EQUAL) return leftValue <= rightValue;
+			if(this.comparisonType == ComparisonExpression.Operator.EQUAL) return leftValue.equals( rightValue );
+			if(this.comparisonType == ComparisonExpression.Operator.GREATER_THAN) return leftValue > rightValue;
+			if(this.comparisonType == ComparisonExpression.Operator.GREATER_THAN_OR_EQUAL) return leftValue >= rightValue;
+			if(this.comparisonType == ComparisonExpression.Operator.LESS_THAN) return leftValue < rightValue;
+			if(this.comparisonType == ComparisonExpression.Operator.LESS_THAN_OR_EQUAL) return leftValue <= rightValue;
 		}catch(Exception e){
 			throw new SQLException("Unable to filter row because: "+e.getMessage(), e);
 		}

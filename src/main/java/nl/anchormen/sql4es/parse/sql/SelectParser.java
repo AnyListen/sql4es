@@ -31,7 +31,7 @@ public class SelectParser extends AstVisitor<Object, QueryState>{
 			Column column = (Column) process(sc.getExpression(), state);
 			if(column != null){
 				String alias = null;
-				if(sc.getAlias().isPresent()) alias = sc.getAlias().get()/*.getValue()*/;
+				if(sc.getAlias().isPresent()) alias = sc.getAlias().get().getValue();
 				column.setAlias(alias);
 				Column col2 = state.getHeading().getColumnByNameAndOp(column.getColumn(), column.getOp());
 				if(col2 != null){
@@ -59,7 +59,7 @@ public class SelectParser extends AstVisitor<Object, QueryState>{
 	@Override
 	protected Column visitExpression(Expression node, QueryState state){
 		if( node instanceof Identifier){
-			return createColumn( ((Identifier)node).getName()/*.getValue()*/, null, state, "select.+", ".+from");
+			return createColumn( ((Identifier)node).getValue(), null, state, "select.+", ".+from");
 		}else if(node instanceof DereferenceExpression){
 			// parse columns like 'reference.field'
 			String column = visitDereferenceExpression((DereferenceExpression)node);
@@ -76,7 +76,7 @@ public class SelectParser extends AstVisitor<Object, QueryState>{
 			else if(fc.getArguments().get(0) instanceof DereferenceExpression)
 				column = visitDereferenceExpression((DereferenceExpression)fc.getArguments().get(0) );
 			else {
-				 column = ((Identifier)fc.getArguments().get(0)).getName()/*.getValue()*/;
+				 column = ((Identifier)fc.getArguments().get(0)).getValue();
 			}
 			try{
 				return createColumn(column, Operation.valueOf(operator.trim().toUpperCase()), state, "select.+", ".+from");
@@ -103,8 +103,8 @@ public class SelectParser extends AstVisitor<Object, QueryState>{
 	
 	public static String visitDereferenceExpression(DereferenceExpression node){
 		if(node.getBase() instanceof Identifier) {
-			return ((Identifier)node.getBase()).getName()/*.getValue()*/+"."+node.getFieldName()/*.getValue()*/;
-		}else return visitDereferenceExpression((DereferenceExpression)node.getBase())+"."+node.getFieldName()/*.getValue()*/;
+			return ((Identifier)node.getBase()).getValue()+"."+node.getField().getValue();
+		}else return visitDereferenceExpression((DereferenceExpression)node.getBase())+"."+node.getField().getValue();
 	}
 	
 	/**
@@ -120,7 +120,7 @@ public class SelectParser extends AstVisitor<Object, QueryState>{
 		protected ICalculation visitArithmeticBinary(ArithmeticBinaryExpression node, QueryState state){
 			ICalculation left = visitExpression(node.getLeft(), state);
 			ICalculation right = visitExpression(node.getRight(), state);
-			return new SimpleCalculation(left, right, node.getType());
+			return new SimpleCalculation(left, right, node.getOperator());
 		}
 		
 		@Override

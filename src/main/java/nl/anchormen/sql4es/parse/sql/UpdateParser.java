@@ -31,10 +31,10 @@ public class UpdateParser extends AstVisitor<List<Object>, QueryState>{
 		if(insert.getQuery().getQueryBody() == null) throw new SQLException("Unable to insert data without any values");
 		if(!(insert.getQuery().getQueryBody() instanceof Values)) throw new SQLException("Unable to insert data from a query, use ... VALUES (...)");
 		
-		List<String> fields = insert.getColumns().get();
+		List<Identifier> fields = insert.getColumns().get();
 		List<Object> values = insert.getQuery().getQueryBody().accept(this,  state);
 		if(state.hasException()) throw state.getException();
-		for(String field : fields) state.getHeading().add(new Column(field));
+		for(Identifier field : fields) state.getHeading().add(new Column(field.getValue()));
 		
 		return values;
 	}

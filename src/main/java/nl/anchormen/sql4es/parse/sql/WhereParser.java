@@ -50,22 +50,22 @@ public class WhereParser extends AstVisitor<QueryWrapper, QueryState>{
 			QueryBuilder lq = lqWrap.getQuery();
 			QueryBuilder rq = rqWrap.getQuery();
 			if(lqWrap.getNestField() != null && lqWrap.getNestField().equals(rqWrap.getNestField())){
-				if(boolExp.getType() == LogicalBinaryExpression.Type.AND){
+				if(boolExp.getOperator() == LogicalBinaryExpression.Operator.AND){
 					bqb.must(lq);
 					bqb.must(rq);
-				}else if(boolExp.getType() == LogicalBinaryExpression.Type.OR){
+				}else if(boolExp.getOperator() == LogicalBinaryExpression.Operator.OR){
 					bqb.should(lq);
 					bqb.should(rq);
 				}
 				return new QueryWrapper(bqb, lqWrap.getNestField());
 			}else{
-				if(boolExp.getType() == LogicalBinaryExpression.Type.AND){
+				if(boolExp.getOperator() == LogicalBinaryExpression.Operator.AND){
 					if(lqWrap.getNestField() != null) bqb.must(QueryBuilders.nestedQuery(lqWrap.getNestField(), lq, ScoreMode.None));
 					else bqb.must(lq);
 					
 					if(rqWrap.getNestField() != null) bqb.must(QueryBuilders.nestedQuery(rqWrap.getNestField(), rq, ScoreMode.None));
 					else bqb.must(rq);
-				}else if(boolExp.getType() == LogicalBinaryExpression.Type.OR){
+				}else if(boolExp.getOperator() == LogicalBinaryExpression.Operator.OR){
 					if(lqWrap.getNestField() != null) bqb.should(QueryBuilders.nestedQuery(lqWrap.getNestField(), lq, ScoreMode.None));
 					else bqb.should(lq);
 					
@@ -138,20 +138,20 @@ public class WhereParser extends AstVisitor<QueryWrapper, QueryState>{
 		QueryBuilder comparison = null;
 		String[] types = new String[state.getSources().size()];
 		for(int i=0; i<types.length; i++) types[i] = state.getSources().get(i).getSource();
-		if(compareExp.getType() == ComparisonExpressionType.EQUAL){
+		if(compareExp.getOperator() == ComparisonExpression.Operator.EQUAL){
 			if(field.equals(Heading.ID)) comparison = QueryBuilders.idsQuery(types).addIds((String)value);
 			else if(field.equals(Heading.SEARCH)) comparison = QueryBuilders.queryStringQuery((String)value);
 			else if(value instanceof String) comparison = queryForString(field, (String)value);
 			else comparison = QueryBuilders.termQuery(field, value);
-		}else if(compareExp.getType() == ComparisonExpressionType.GREATER_THAN_OR_EQUAL){
+		}else if(compareExp.getOperator() == ComparisonExpression.Operator.GREATER_THAN_OR_EQUAL){
 			comparison = QueryBuilders.rangeQuery(field).from(value);
-		}else if(compareExp.getType() == ComparisonExpressionType.LESS_THAN_OR_EQUAL){
+		}else if(compareExp.getOperator() == ComparisonExpression.Operator.LESS_THAN_OR_EQUAL){
 			comparison = QueryBuilders.rangeQuery(field).to(value);
-		}else if(compareExp.getType() == ComparisonExpressionType.GREATER_THAN){
+		}else if(compareExp.getOperator() == ComparisonExpression.Operator.GREATER_THAN){
 			comparison = QueryBuilders.rangeQuery(field).gt(value);
-		}else if(compareExp.getType() == ComparisonExpressionType.LESS_THAN){
+		}else if(compareExp.getOperator() == ComparisonExpression.Operator.LESS_THAN){
 			comparison = QueryBuilders.rangeQuery(field).lt(value);
-		}else if(compareExp.getType() == ComparisonExpressionType.NOT_EQUAL){
+		}else if(compareExp.getOperator() == ComparisonExpression.Operator.NOT_EQUAL){
 			if(field.equals(Heading.ID)){
 				state.addException("Matching document _id using '<>' is not supported");
 				return null;
@@ -207,7 +207,7 @@ public class WhereParser extends AstVisitor<QueryWrapper, QueryState>{
 			// parse columns like 'reference.field'
 			return SelectParser.visitDereferenceExpression((DereferenceExpression)e);
 		}else if (e instanceof Identifier){
-			return ((Identifier)e).getName();
+			return ((Identifier)e).getValue();
 		} else return e.toString();
 	}
 	
@@ -241,12 +241,12 @@ public class WhereParser extends AstVisitor<QueryWrapper, QueryState>{
 			else state.addException("Function '"+fc.getName()+"' is not supported");
 		}else if(expression instanceof CurrentTime){
 			CurrentTime ct = (CurrentTime)expression;
-			if(ct.getType() == CurrentTime.Type.DATE) return new LocalDate().toDate();
-			else if(ct.getType() == CurrentTime.Type.TIME) return new Date(new LocalTime(DateTimeZone.UTC).getMillisOfDay());
-			else if(ct.getType() == CurrentTime.Type.TIMESTAMP) return new Date();
-			else if(ct.getType() == CurrentTime.Type.LOCALTIME) return new Date(new LocalTime(DateTimeZone.UTC).getMillisOfDay());
-			else if(ct.getType() == CurrentTime.Type.LOCALTIMESTAMP) return new Date();
-			else state.addException("CurrentTime function '"+ct.getType()+"' is not supported");
+			if(ct.getFunction() == CurrentTime.Function.DATE) return new LocalDate().toDate();
+			else if(ct.getFunction() == CurrentTime.Function.TIME) return new Date(new LocalTime(DateTimeZone.UTC).getMillisOfDay());
+			else if(ct.getFunction() == CurrentTime.Function.TIMESTAMP) return new Date();
+			else if(ct.getFunction() == CurrentTime.Function.LOCALTIME) return new Date(new LocalTime(DateTimeZone.UTC).getMillisOfDay());
+			else if(ct.getFunction() == CurrentTime.Function.LOCALTIMESTAMP) return new Date();
+			else state.addException("CurrentTime function '"+ct.getFunction()+"' is not supported");
 			
 		}else state.addException("Literal type "+expression.getClass().getSimpleName()+" is not supported");
 		return null;
